@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>EventSource Demo</title>
+  <script src="./js/jquery.slim.js"></script>
+</head>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #eee;
+    font: 100%/1.5 "Source Sans Pro", "Helvetica Neue", Helvetica, sans-serif;
+    padding-top: 2em;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+
+  h1 {
+    margin-top: 0;
+  }
+
+  #messages {
+    max-height: 480px;
+    overflow-y: auto;
+  }
+</style>
+<script>
+  if (typeof (EventSource) !== "undefined") {
+    var source = new EventSource("/events");
+    source.onmessage = function (event) {
+      if (!event)
+        source.close();
+      else
+        document.getElementById("result").innerHTML += event.data + "<br>";
+    };
+    window.closedConnection = () => {
+      source.close()
+    }
+    window.onbeforeunload = () => {
+      console.log("closing");
+      return "ต้องการปิดหน้าเว็บหรือไม่?";
+    };
+    window.onunload = () => {
+      console.log("closed");
+      source.close()
+    }
+  } else {
+    document.getElementById("result").innerHTML = "Sorry, your browser does not support server-sent events...";
+  }
+  const data = {
+    "transaction_id": "123456-acbd-123456-abcde"
+  }
+  const send = () => {
+    fetch("/computed", {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      })
+      .then(response => response)
+      .then(data => console.log(data));
+  }
+  const closer = () => {
+    source.close()
+  }
+</script>
+
+<body>
+  <div class="container">
+    <h1>Messages</h1>
+    <button onclick="send()">SEND REQUEST</button>
+    <button onclick="closer()">close</button>
+    <div id="messages"></div>
+    <h2>Result</h2>
+    <div id="result"></div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+### Computed something API
+
+POST http://localhost:7777/computed HTTP/1.1
+Content-Type: application/json
+
+{
+  "transaction_id": "123456-acbd-123456-abcde"
+}
+
+  # "transaction_id": "123456-acbd-123456-abcd"
